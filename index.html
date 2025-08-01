@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolillero de Bingo de la Especial</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Bolillero de Bingo de la Especial</h1>
+        
+        <!-- Tablero principal - ARRIBA -->
+        <div class="tablero" id="tablero">
+            <!-- Se generará dinámicamente con JavaScript -->
+        </div>
+
+
+
+        <!-- Historial de números - ABAJO -->
+        <div class="historial">
+            <h3>Números Sacados:</h3>
+            <div id="historial-numeros" class="numeros-sacados"></div>
+        </div>
+
+        <!-- Indicador de selección -->
+        <div id="indicador-seleccion" class="indicador-seleccion" style="display: none;">
+            <span id="contador-seleccion">0 números seleccionados</span>
+            <button id="btn-limpiar-seleccion" class="btn-limpiar">🗑️ Limpiar</button>
+        </div>
+
+        <!-- Panel de asignación de nombre -->
+        <div id="panel-asignacion" class="panel-asignacion" style="display: none;">
+            <div class="asignacion-content">
+                <h3>Asignar Jugador</h3>
+                <p>Has seleccionado <span id="numeros-seleccionados-texto"></span></p>
+                <input type="text" id="nombre-jugador-input" placeholder="Nombre del jugador" maxlength="20">
+                <div class="asignacion-botones">
+                    <button id="confirmar-asignacion" class="btn-confirmar">✅ Confirmar</button>
+                    <button id="cancelar-asignacion" class="btn-cancelar">❌ Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Jugadores Registrados - AL FINAL -->
+        <div class="jugadores-registrados">
+            <h3>Jugadores Registrados:</h3>
+            <div id="lista-jugadores" class="lista-jugadores">
+                <div class="no-jugadores">No hay jugadores registrados</div>
+            </div>
+        </div>
+                <!-- Panel de control - MEDIO -->
+        <div class="control-panel">
+            <div class="bolillero">
+                <div id="numero-actual" class="numero-display">-</div>
+                <button id="sacar-numero" class="btn-sacar">Sacar Número</button>
+                
+                <button id="modo-automatico-btn" class="btn-auto-toggle">🤖 Modo Automático</button>
+                
+                <div id="controles-automatico" class="controles-automatico" style="display: none;">
+                    <div class="auto-intervalo">
+                        <label>Segundos: 
+                            <input type="number" id="intervalo-segundos" value="3" min="1" max="10" class="input-segundos">
+                        </label>
+                    </div>
+                    <div class="auto-botones">
+                        <button id="iniciar-pausar-auto" class="btn-iniciar-pausar">▶️ Iniciar</button>
+                        <button id="detener-auto" class="btn-detener-auto">⏹️ Detener</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-panel">
+                <!-- Configuración de Tablero -->
+                <div class="config-tablero">
+                    <h3>Configuración del Tablero:</h3>
+                    <div class="tablero-config">
+                        <label>Total de números: 
+                            <input type="number" id="total-numeros" min="5" max="50" step="5" value="25" class="numero-input">
+                        </label>
+                        <button id="aplicar-config" class="btn-config">Aplicar</button>
+                    </div>
+                </div>
+
+                <div class="premios">
+                    <h3>Configuración de Premios:</h3>
+                    <div class="premio-config">
+                        <div class="premio-cantidad">
+                            <label>Cantidad de premios: 
+                                <select id="cantidad-premios">
+                                    <option value="3">3 premios</option>
+                                    <option value="4">4 premios</option>
+                                    <option value="5" selected>5 premios</option>
+                                    <option value="6">6 premios</option>
+                                    <option value="7">7 premios</option>
+                                    <option value="8">8 premios</option>
+                                    <option value="10">10 premios</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="premios-inputs" id="premios-inputs">
+                            <!-- Se generarán dinámicamente -->
+                        </div>
+                        <button id="actualizar-premios" class="btn-config">Actualizar Premios</button>
+                    </div>
+                    <div class="premios-lista" id="premios-lista">
+                        <!-- Se generarán dinámicamente -->
+                    </div>
+                </div>
+                
+                <div class="controles">
+                    <button id="reset-game" class="btn-reset">🔄 Nuevo Juego</button>
+                    <button id="ultimo-numero" class="btn-ultimo">👁️ Último Número</button>
+                    <button id="exportar-pdf" class="btn-export">📄 Exportar PDF</button>
+                </div>
+                
+                <div class="estadisticas">
+                    <div>Números sacados: <span id="count-numeros">0</span></div>
+                    <div>Números completados: <span id="count-completados">0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="audio.js"></script>
+    <script src="tablero.js"></script>
+    <script src="jugadores.js"></script>
+    <script src="premios.js"></script>
+    <script src="pdf.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
