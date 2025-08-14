@@ -807,8 +807,8 @@ h1.numero-sacado {
 }
 
 .numero-card.ocupado {
-    border-color: #ffc107;
-    background: #fff3cd;
+    border-color: rgb(255, 0, 0);
+    background: #ffffff;
 }
 
 .numero-card.completado {
