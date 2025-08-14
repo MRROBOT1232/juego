@@ -10,8 +10,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>Bolillero de Bingo de la Especial</h1>
-        
+        <h1>Bolillero de Bingo de la Especial Pichi</h1>
+    <!-- <script type="module" src="voces.js"></script> -->
         <!-- Tablero principal - ARRIBA -->
         <div class="tablero" id="tablero">
             <!-- Se generará dinámicamente con JavaScript -->
@@ -20,6 +20,8 @@
 
 
         <!-- Historial de números - ABAJO -->
+        <div id="numero-actual" class="numero-display">-</div>
+
         <div class="historial">
             <h3>Números Sacados:</h3>
             <div id="historial-numeros" class="numeros-sacados"></div>
@@ -54,9 +56,9 @@
                 <!-- Panel de control - MEDIO -->
         <div class="control-panel">
             <div class="bolillero">
-                <div id="numero-actual" class="numero-display">-</div>
                 <button id="sacar-numero" class="btn-sacar">Sacar Número</button>
-                
+                <br><br>
+                <!-- Selector de voz eliminado -->
                 <button id="modo-automatico-btn" class="btn-auto-toggle">🤖 Modo Automático</button>
                 
                 <div id="controles-automatico" class="controles-automatico" style="display: none;">

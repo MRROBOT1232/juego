@@ -4,8 +4,18 @@ class BingoAudio {
         this.sonidoActivo = true;
     }
 
-    // Métodos vacíos para compatibilidad
-    hablarNumero() {}
+    // Reproduce el audio personalizado de la bolilla si existe
+    // Reproduce el audio y retorna una promesa que se resuelve al terminar
+    hablarNumero(numero) {
+            return new Promise(resolve => {
+                if (!this.sonidoActivo) return resolve();
+                const audioPath = `Audio/${numero}.mp3`;
+                const audio = new Audio(audioPath);
+                audio.onended = () => resolve();
+                audio.onerror = () => resolve();
+                audio.play().catch(() => resolve());
+            });
+    }
     anunciarGanador() {}
     toggleVoz() { return false; }
     detenerVoz() {}

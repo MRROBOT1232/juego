@@ -1,4 +1,7 @@
 // Script principal del Bingo Especial - Optimizado
+// --- INICIO: Cargar voces y manejar selección ---
+// --- Selector de voz eliminado ---
+
 class BingoEspecial {
     constructor() {
         this.historial = [];
@@ -39,13 +42,28 @@ class BingoEspecial {
         this.historial.push(numero);
         this.ultimoNumero = numero;
 
-        window.bingoAudio.reproducirSonidoBolilla();
-        this.animarTitulo();
-
-        this.updateNumeroDisplay(numero);
-        window.bingoTablero.updateTableroNumero(numero);
-        this.updateHistorial();
-        this.updateStats();
+        // Animación de bolilla girando antes de mostrar el número
+        const display = document.getElementById('numero-actual');
+        display.classList.add('bolilla-girando');
+        display.textContent = '';
+        setTimeout(() => {
+            display.textContent = numero;
+            display.classList.remove('bolilla-girando');
+            window.bingoTablero.updateTableroNumero(numero);
+            this.updateHistorial();
+            this.updateStats();
+            this.animarTitulo();
+            // --- Solo reproducir audio personalizado de la bolilla ---
+            if (window.bingoAudio && typeof window.bingoAudio.hablarNumero === 'function') {
+                window.bingoAudio.hablarNumero(numero);
+            }
+            if (window.bingoTablero.marcarNumeroCompleto(numero)) {
+                setTimeout(() => {
+                    this.showNotification(`🎉 ¡NÚMERO ${numero} COMPLETADO! 🎉`, 'completado');
+                    window.bingoAudio.reproducirSonidoFestejo();
+                }, 500);
+            }
+        }, 800);
 
         if (window.bingoTablero.marcarNumeroCompleto(numero)) {
             setTimeout(() => {
@@ -295,11 +313,58 @@ class BingoEspecial {
         
         document.getElementById('sacar-numero').disabled = true;
         
-        this.intervaloAutomatico = setInterval(() => this.sacarNumero(), this.intervaloTiempo);
+        // Usar ciclo asíncrono en vez de setInterval
+        this._modoAutoActivo = true;
+        const cicloAutomatico = async () => {
+            while (this._modoAutoActivo && this.estadoAutomatico === 'iniciado') {
+                const numero = window.bingoTablero.getNumerosDisponibles() > 0 ? window.bingoTablero.numerosDisponibles[0] : null;
+                await this.sacarNumeroAuto();
+                await new Promise(res => setTimeout(res, this.intervaloTiempo));
+            }
+        };
+        cicloAutomatico();
         this.showNotification(`Modo automático iniciado - cada ${segundos} segundos`);
+
+    }
+
+    // Nueva función para modo automático que espera el audio
+    async sacarNumeroAuto() {
+        // Verificar si todos los premios ya han sido entregados
+        if (window.bingoPremios?.getEstadisticas().premiosRestantes === 0) {
+            this.showNotification('🎉 ¡Todos los premios han sido entregados!', 'completado');
+            this.detenerModoAutomatico();
+            return;
+        }
+        const numero = window.bingoTablero.sacarNumero();
+        if (!numero) {
+            this.showNotification('¡Todos los números han sido completados!');
+            this.detenerModoAutomatico();
+            return;
+        }
+        if (this.historial.length === 0) this.activarModoJuego();
+        this.historial.push(numero);
+        this.ultimoNumero = numero;
+        this.updateNumeroDisplay(numero);
+        window.bingoTablero.updateTableroNumero(numero);
+        this.updateHistorial();
+        this.updateStats();
+    // window.bingoAudio.reproducirSonidoBolilla(); // Eliminado, solo se reproduce el mp3
+        this.animarTitulo();
+        if (window.bingoAudio && typeof window.bingoAudio.hablarNumero === 'function') {
+            await window.bingoAudio.hablarNumero(numero);
+        }
+        if (window.bingoTablero.marcarNumeroCompleto(numero)) {
+            setTimeout(() => {
+                this.showNotification(`🎉 ¡NÚMERO ${numero} COMPLETADO! 🎉`, 'completado');
+                window.bingoAudio.reproducirSonidoFestejo();
+            }, 500);
+        }
+        this.procesarGanadores(numero);
+        window.bingoJugadores.updateJugadoresDisplay();
     }
 
     pausarModoAutomatico() {
+        this._modoAutoActivo = false;
         if (this.intervaloAutomatico) {
             clearInterval(this.intervaloAutomatico);
             this.intervaloAutomatico = null;
@@ -319,16 +384,23 @@ class BingoEspecial {
         btn.textContent = '⏸️ Pausar';
         btn.classList.remove('pausado');
         
-        this.intervaloAutomatico = setInterval(() => this.sacarNumero(), this.intervaloTiempo);
+        this._modoAutoActivo = true;
+        const cicloAutomatico = async () => {
+            while (this._modoAutoActivo && this.estadoAutomatico === 'iniciado') {
+                await this.sacarNumeroAuto();
+                await new Promise(res => setTimeout(res, this.intervaloTiempo));
+            }
+        };
+        cicloAutomatico();
         this.showNotification('Modo automático reanudado');
     }
 
     detenerModoAutomatico() {
+        this._modoAutoActivo = false;
         if (this.intervaloAutomatico) {
             clearInterval(this.intervaloAutomatico);
             this.intervaloAutomatico = null;
         }
-        
         this.modoAutomatico = false;
         this.estadoAutomatico = 'detenido';
         
@@ -431,7 +503,7 @@ style.textContent = `
     @keyframes slideIn {
         from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
         to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    }
+}
 `;
 document.head.appendChild(style);
 
